@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>诗境·中国 - 计算机设计大赛</title>
+    <title>诗境·中国 - 像素级还原版</title>
     
     <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
@@ -11,83 +11,169 @@
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     
     <style>
-        /* 全局青绿山水配色 [cite: 11, 24] */
-        body { 
-            margin: 0; 
-            background-color: #f5f5dc; 
-            font-family: "Microsoft YaHei", "STKaiti", serif; 
-            color: #2f4f4f;
+        :root {
+            --primary-green: #2e8b57;
+            --bg-paper: #f5f5dc;
         }
-        #app { max-width: 600px; margin: 0 auto; min-height: 100vh; position: relative; padding-bottom: 70px; }
-        
-        /* 顶部导航栏 [cite: 4, 16] */
-        .header { background: #2f4f4f; color: #fff; padding: 15px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-        
-        /* 地图区域 [cite: 6, 32] */
-        #map-container { width: 100%; height: 400px; background: #e0eee8; border-bottom: 2px solid #2e8b57; }
-        
-        /* 底部滚动卡片区域 [cite: 8, 11] */
-        .card-row { display: flex; overflow-x: auto; padding: 15px; gap: 15px; scrollbar-width: none; }
-        .card-row::-webkit-scrollbar { display: none; }
-        
-        .poem-card { 
-            min-width: 220px; 
-            border-radius: 12px; 
-            cursor: pointer; 
-            border: 1px solid #dcdcdc;
-            transition: transform 0.3s;
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: var(--bg-paper);
+            font-family: "STKaiti", "Microsoft YaHei", serif;
+            overflow: hidden; /* 防止整页滚动，由内部组件滚动 */
         }
-        .poem-card:hover { transform: translateY(-5px); }
-        .poem-card img { width: 100%; height: 130px; object-fit: cover; border-radius: 8px 8px 0 0; }
-        
-        /* 底部菜单栏 [cite: 3, 42, 56, 82] */
-        .nav-footer { position: fixed; bottom: 0; width: 100%; max-width: 600px; border-top: 1px solid #ddd; }
-        
-        /* 智能解读弹窗美化 [cite: 72, 77] */
-        .el-dialog { border-radius: 15px !important; }
-        .tag-box { margin: 10px 0; }
-        .translation-text { text-align: justify; line-height: 1.6; color: #444; }
+
+        #app {
+            max-width: 450px; /* 模拟手机比例 */
+            margin: 0 auto;
+            height: 100vh;
+            position: relative;
+            background: url('./bg.jpg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        /* 顶部搜索区域还原 */
+        .header-box {
+            padding: 40px 20px 10px;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.8), transparent);
+        }
+        .search-bar {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        /* 地图层 */
+        #map-container {
+            flex: 1;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* 右侧推荐面板还原 */
+        .right-panel {
+            position: absolute;
+            right: 15px;
+            top: 120px;
+            width: 45px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 10;
+        }
+        .side-btn {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+
+        /* 底部滑动卡片还原 */
+        .bottom-scroll-area {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            z-index: 10;
+        }
+        .card-wrapper {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px 10px;
+            gap: 15px;
+            scroll-snap-type: x mandatory; /* 边缘吸附效果 */
+            scrollbar-width: none;
+        }
+        .card-wrapper::-webkit-scrollbar { display: none; }
+
+        .poem-card {
+            min-width: 200px;
+            height: 110px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            display: flex;
+            padding: 10px;
+            scroll-snap-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .card-img {
+            width: 80px;
+            height: 90px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+        .card-info {
+            padding-left: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* 底部导航栏还原 */
+        .footer-nav {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 65px;
+            background: #fff;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #eee;
+            z-index: 20;
+        }
+        .nav-item { text-align: center; color: #999; font-size: 12px; }
+        .nav-item.active { color: var(--primary-green); font-weight: bold; }
+        .nav-icon { font-size: 20px; display: block; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
 <div id="app">
-    <div class="header">
-        <h2 style="margin:0; font-weight: normal; letter-spacing: 2px;">诗境·中国</h2>
+    <div class="header-box">
+        <el-input 
+            placeholder="搜索诗词、地点、诗人" 
+            class="search-bar"
+            prefix-icon="Search">
+        </el-input>
     </div>
 
     <div id="map-container"></div>
 
-    <div class="card-row">
-        <el-card v-for="item in spots" :key="item.name" class="poem-card" @click="showDetail(item)" shadow="hover">
-            <img :src="item.img" alt="地点图片">
-            <div style="padding: 10px;">
-                <h4 style="margin: 5px 0;">{{item.name}} · {{item.poet}}</h4>
-                <p style="font-size: 13px; color: #666; margin: 0;">{{item.poem}}</p>
-            </div>
-        </el-card>
+    <div class="right-panel">
+        <div class="side-btn"><el-icon><Location /></el-icon></div>
+        <div class="side-btn"><el-icon><Share /></el-icon></div>
     </div>
 
-    <el-dialog v-model="dialogVisible" :title="activeSpot.poem" width="90%" center>
-        <div style="text-align: center;">
-            <div class="tag-box">
-                <el-tag type="success" effect="dark">{{activeSpot.poet}} · {{activeSpot.dynasty}}</el-tag>
-                <el-tag type="danger" style="margin-left: 10px;">{{activeSpot.tag}}</el-tag>
+    <div class="bottom-scroll-area">
+        <div class="card-wrapper">
+            <div class="poem-card" v-for="item in spots" :key="item.name">
+                <img :src="item.img" class="card-img">
+                <div class="card-info">
+                    <div style="font-weight:bold; font-size:16px;">{{item.name}}</div>
+                    <div style="font-size:13px; color:#666; margin:4px 0;">{{item.poet}} · {{item.dynasty}}</div>
+                    <div style="font-size:12px; color:var(--primary-green);">{{item.tag}}</div>
+                </div>
             </div>
-            <el-divider>白话翻译</el-divider>
-            <p class="translation-text">{{activeSpot.desc}}</p>
         </div>
-        <template #footer>
-            <el-button type="success" @click="dialogVisible = false" style="width: 100%;">知道了</el-button>
-        </template>
-    </el-dialog>
+    </div>
 
-    <el-menu mode="horizontal" class="nav-footer" default-active="1" active-text-color="#2e8b57">
-        <el-menu-item index="1">首页</el-menu-item>
-        <el-menu-item index="2">诗人</el-menu-item>
-        <el-menu-item index="3">路线</el-menu-item>
-        <el-menu-item index="4">我的</el-menu-item>
-    </el-menu>
+    <div class="footer-nav">
+        <div class="nav-item active"><span class="nav-icon">🏯</span>首页</div>
+        <div class="nav-item"><span class="nav-icon">👤</span>诗人</div>
+        <div class="nav-item"><span class="nav-icon">🗺️</span>路线</div>
+        <div class="nav-item"><span class="nav-icon">🔍</span>检索</div>
+        <div class="nav-item"><span class="nav-icon">⚙️</span>我的</div>
+    </div>
 </div>
 
 <script>
@@ -95,85 +181,48 @@
 
     createApp({
         setup() {
-            const dialogVisible = ref(false);
-            const activeSpot = ref({});
-            
-            // 数据源：由包宇露负责填充 
             const spots = ref([
-                { 
-                    name: '黄鹤楼', 
-                    poet: '李白', 
-                    dynasty: '唐',
-                    poem: '《黄鹤楼送孟浩然之广陵》', 
-                    tag: '豪迈', 
-                    desc: '老朋友在西边辞别了黄鹤楼，在柳絮如烟、繁花似锦的阳春三月去扬州。孤船的帆影渐渐远去，消失在碧空的尽头，只看见长江浩浩荡荡地向天边流去。', 
-                    img: 'https://images.unsplash.com/photo-1599591459357-316279d47d3c?w=500' 
-                },
-                { 
-                    name: '西湖', 
-                    poet: '白居易', 
-                    dynasty: '唐',
-                    poem: '《钱塘湖春行》', 
-                    tag: '清新', 
-                    desc: '从孤山寺北到贾亭之西，湖水刚刚涨满，与岸齐平，云层很低。几只早莺争着飞向阳光暖和的树木，谁家新来的燕子正忙着衔泥筑巢。', 
-                    img: 'https://images.unsplash.com/photo-1596434449071-729226501716?w=500' 
-                }
+                { name: '黄鹤楼', poet: '李白', dynasty: '唐', tag: '故人西辞黄鹤楼', img: 'https://images.unsplash.com/photo-1599591459357-316279d47d3c?w=200' },
+                { name: '西湖', poet: '白居易', dynasty: '唐', tag: '绿杨阴里白沙堤', img: 'https://images.unsplash.com/photo-1596434449071-729226501716?w=200' },
+                { name: '滕王阁', poet: '王勃', dynasty: '唐', tag: '落霞与孤鹜齐飞', img: 'https://images.unsplash.com/photo-1523731407965-2430cd12f5e4?w=200' }
             ]);
 
-            // 弹窗交互：由李银焰负责优化 
-            const showDetail = (item) => {
-                activeSpot.value = item;
-                dialogVisible.value = true;
-            };
-
             onMounted(() => {
-                // 地图初始化：由金丹彤负责实现联动 
                 const chart = echarts.init(document.getElementById('map-container'));
                 
-                // 确保已将地图文件改名为 china.json 并上传
-                fetch('./china.json')
-                    .then(res => {
-                        if(!res.ok) throw new Error("地图文件 china.json 没找到，请检查文件名！");
-                        return res.json();
-                    })
-                    .then(geoJson => {
-                        echarts.registerMap('china', geoJson);
-                        chart.setOption({
-                            geo: { 
-                                map: 'china', 
-                                roam: true, // 支持缩放
-                                itemStyle: { areaColor: '#c1d8ac', borderColor: '#2f4f4f' },
-                                emphasis: { itemStyle: { areaColor: '#a8c69f' } }
+                fetch('./china.json').then(res => res.json()).then(geoJson => {
+                    echarts.registerMap('china', geoJson);
+                    chart.setOption({
+                        geo: { 
+                            map: 'china', 
+                            roam: false, 
+                            layoutCenter: ['50%', '45%'],
+                            layoutSize: '100%',
+                            // 重点：将地图设为全透明，只露出标记点
+                            itemStyle: { 
+                                areaColor: 'transparent', 
+                                borderColor: 'rgba(46, 139, 87, 0.2)' 
                             },
-                            series: [{
-    type: 'scatter',
-    coordinateSystem: 'geo',
-    // 在这里增加你文档中提到的所有地点 [cite: 8, 11]
-    data: [
-        { name: '武汉·黄鹤楼', value: [114.31, 30.52] },
-        { name: '杭州·西湖', value: [120.15, 30.28] },
-        { name: '南昌·滕王阁', value: [115.88, 28.69] },
-        { name: '西安·大雁塔', value: [108.96, 34.22] },
-        { name: '成都·杜甫草堂', value: [104.03, 30.66] }
-    ],
-    itemStyle: { 
-        color: '#e31d1d' // 文档要求的红色标记点 [cite: 7, 11]
-    },
-    symbolSize: 12, // 标记点大小
-    label: {
-        show: false, // 默认不显示文字，点击或悬浮时可配置显示
-        formatter: '{b}',
-        position: 'right'
-    }
-}]；
-                        
-                        // 响应式地图大小
-                        window.addEventListener('resize', () => chart.resize());
-                    })
-                    .catch(err => alert(err.message));
+                            emphasis: { disabled: true }
+                        },
+                        series: [{
+                            type: 'scatter',
+                            coordinateSystem: 'geo',
+                            // 金丹彤：请在此处对应设计稿红点位置增加坐标
+                            data: [
+                                { name: '武汉', value: [114.31, 30.52] },
+                                { name: '南昌', value: [115.88, 28.69] },
+                                { name: '杭州', value: [120.15, 30.28] },
+                                { name: '西安', value: [108.96, 34.22] }
+                            ],
+                            itemStyle: { color: '#e31d1d', shadowBlur: 5, shadowColor: '#fff' },
+                            symbolSize: 10
+                        }]
+                    });
+                });
             });
 
-            return { spots, dialogVisible, activeSpot, showDetail };
+            return { spots };
         }
     }).use(ElementPlus).mount('#app');
 </script>
