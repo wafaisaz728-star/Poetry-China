@@ -146,16 +146,26 @@
                                 emphasis: { itemStyle: { areaColor: '#a8c69f' } }
                             },
                             series: [{
-                                type: 'scatter',
-                                coordinateSystem: 'geo',
-                                data: [
-                                    { name: '武汉', value: [114.31, 30.52] },
-                                    { name: '杭州', value: [120.15, 30.28] }
-                                ],
-                                itemStyle: { color: '#e31d1d' },
-                                symbolSize: 12
-                            }]
-                        });
+    type: 'scatter',
+    coordinateSystem: 'geo',
+    // 在这里增加你文档中提到的所有地点 [cite: 8, 11]
+    data: [
+        { name: '武汉·黄鹤楼', value: [114.31, 30.52] },
+        { name: '杭州·西湖', value: [120.15, 30.28] },
+        { name: '南昌·滕王阁', value: [115.88, 28.69] },
+        { name: '西安·大雁塔', value: [108.96, 34.22] },
+        { name: '成都·杜甫草堂', value: [104.03, 30.66] }
+    ],
+    itemStyle: { 
+        color: '#e31d1d' // 文档要求的红色标记点 [cite: 7, 11]
+    },
+    symbolSize: 12, // 标记点大小
+    label: {
+        show: false, // 默认不显示文字，点击或悬浮时可配置显示
+        formatter: '{b}',
+        position: 'right'
+    }
+}]；
                         
                         // 响应式地图大小
                         window.addEventListener('resize', () => chart.resize());
